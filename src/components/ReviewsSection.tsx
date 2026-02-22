@@ -82,22 +82,23 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
 
         {/* Artist Selector with sliding background */}
         <div className="relative" ref={artistRowRef}>
-          {/* Sliding glass-orange pill behind active artist - connects to container below */}
+      {/* Sliding glass-orange jelly pill - bridges into the container below */}
           {tabStyle && (
             <div
-              className="absolute glass-orange pointer-events-none"
+              className="absolute pointer-events-none"
               style={{
                 left: tabStyle.left - 8,
                 width: tabStyle.width + 16,
                 top: -4,
-                bottom: -16, // extends below to overlap with the content container
-                borderBottomLeftRadius: 0,
-                borderBottomRightRadius: 0,
-                borderBottom: 'none',
+                bottom: -24,
+                background: 'hsl(30 60% 92% / 0.65)',
+                border: '1px solid hsl(30 40% 85% / 0.5)',
+                borderRadius: '1.25rem 1.25rem 1.25rem 1.25rem',
+                borderBottom: '1px solid transparent',
                 transition: 'left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 animation: isJiggling ? 'jelly 0.55s ease' : 'none',
                 transformOrigin: 'bottom center',
-                zIndex: 0,
+                zIndex: 5,
               }}
             />
           )}
@@ -154,13 +155,13 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
         </div>
       </div>
 
-      {/* Reviews Container in glass - visually connected to the sliding tab above */}
+      {/* Reviews Container - overlaps upward into the pill via negative margin */}
       <div
         ref={containerRef}
-        className="mx-3 glass-orange p-1"
+        className="mx-3 glass-orange p-1 relative"
         style={{
-          borderTopLeftRadius: 0,
-          borderTopRightRadius: 0,
+          marginTop: -12,
+          zIndex: 10,
           animation: isJiggling ? 'jelly-container 0.5s ease' : 'none',
           transformOrigin: 'top center',
         }}
