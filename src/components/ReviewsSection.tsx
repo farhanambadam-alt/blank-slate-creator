@@ -9,6 +9,12 @@ interface ReviewsSectionProps {
   onSelectArtist: (id: string | null) => void;
 }
 
+const PILL_BG = '#F8F1E9';
+const PILL_BORDER = '#E8DED6';
+const MUTED_TAUPE = '#9C918C';
+const MUTED_BRONZE = '#9A7B6D';
+const EMPTY_STAR = '#E8DED6';
+
 const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: ReviewsSectionProps) => {
   const [reviewFilter, setReviewFilter] = useState<string>('all');
   const [isJiggling, setIsJiggling] = useState(false);
@@ -37,9 +43,6 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
     'https://images.unsplash.com/photo-1622288432450-277d0fef5ed6?w=300&h=300&fit=crop',
   ];
 
-  const PILL_COLOR = 'hsl(30 42% 94%)';
-
-  // Measure and position the sliding tab
   const updateTabPosition = useCallback(() => {
     const key = selectedArtist ?? '_all';
     const btn = buttonRefs.current.get(key);
@@ -61,10 +64,9 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
     return () => window.removeEventListener('resize', updateTabPosition);
   }, [updateTabPosition]);
 
-  // Trigger jiggle on artist change
   useEffect(() => {
     setIsJiggling(true);
-    const timer = setTimeout(() => setIsJiggling(false), 600);
+    const timer = setTimeout(() => setIsJiggling(false), 700);
     return () => clearTimeout(timer);
   }, [selectedArtist]);
 
@@ -79,14 +81,17 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
       <div className="px-5 pt-5 pb-1">
         <div className="flex items-baseline justify-between mb-5">
           <h2 className="font-serif text-xl text-truffle italic">Our Stylists</h2>
-          <button className="text-[11px] font-sans font-semibold text-bronze uppercase tracking-widest">
+          <button
+            className="text-[11px] font-sans font-semibold uppercase tracking-widest"
+            style={{ color: MUTED_TAUPE }}
+          >
             View All
           </button>
         </div>
 
         {/* Artist Selector */}
         <div className="relative" ref={artistRowRef}>
-          {/* Jelly Pill — Layer 1: behind avatars (z-1), in front of nothing */}
+          {/* Jelly Pill — z-index 1, behind avatars (z-2), below container (z-3) */}
           {tabStyle && (
             <div
               className="absolute pointer-events-none"
@@ -95,9 +100,13 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
                 width: tabStyle.width + 24,
                 top: -8,
                 bottom: -28,
-                background: PILL_COLOR,
+                background: PILL_BG,
                 borderRadius: '40px 40px 0 0',
-                transition: 'left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                borderLeft: `1px solid ${PILL_BORDER}`,
+                borderRight: `1px solid ${PILL_BORDER}`,
+                borderTop: `1px solid ${PILL_BORDER}`,
+                boxShadow: `0 4px 12px rgba(0,0,0,0.04)`,
+                transition: 'left 0.7s cubic-bezier(0.2, 1, 0.3, 1), width 0.5s cubic-bezier(0.2, 1, 0.3, 1)',
                 animation: isJiggling ? 'jelly 0.55s ease' : 'none',
                 transformOrigin: 'bottom center',
                 zIndex: 1,
@@ -105,35 +114,39 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
             />
           )}
 
-          {/* Artists Row — Layer 2: above pill */}
+          {/* Artists Row — z-index 2, above pill */}
           <div
             className="flex overflow-x-auto scrollbar-hide pb-4 items-end justify-evenly relative"
             style={{ zIndex: 2 }}
           >
-            {/* "All" button */}
             <button
               ref={setButtonRef('_all')}
               onClick={() => onSelectArtist(null)}
               className="flex flex-col items-center gap-2 flex-shrink-0 min-w-[72px]"
             >
               <div
-                className={`rounded-full bg-champagne flex items-center justify-center text-[11px] font-sans font-bold text-truffle border-2 transition-all duration-300 ease-out ${
+                className={`rounded-full flex items-center justify-center text-[11px] font-sans font-bold text-truffle border-2 transition-all duration-300 ease-out ${
                   !selectedArtist
                     ? 'w-16 h-16 border-bronze/40 shadow-md'
                     : 'w-12 h-12 border-transparent opacity-50'
                 }`}
-                style={!selectedArtist && isJiggling ? { animation: 'jelly 0.55s ease', transformOrigin: 'bottom center' } : undefined}
+                style={{
+                  background: PILL_BG,
+                  ...((!selectedArtist && isJiggling) ? { animation: 'jelly 0.55s ease', transformOrigin: 'bottom center' } : {}),
+                }}
               >
                 ALL
               </div>
-              <span className={`text-[9px] font-sans uppercase tracking-widest transition-all duration-200 ${
-                !selectedArtist ? 'font-bold text-truffle' : 'font-medium text-bronze/40'
-              }`}>
+              <span
+                className={`text-[9px] font-sans uppercase tracking-widest transition-all duration-200 ${
+                  !selectedArtist ? 'font-bold text-truffle' : 'font-medium'
+                }`}
+                style={selectedArtist ? { color: MUTED_TAUPE } : undefined}
+              >
                 All Artists
               </span>
             </button>
 
-            {/* Individual artists */}
             {artists.map((artist) => {
               const isSelected = selectedArtist === artist.id;
               return (
@@ -153,9 +166,12 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
                   >
                     <img src={artist.avatar} alt={artist.name} className="w-full h-full object-cover" />
                   </div>
-                  <span className={`text-[9px] font-sans uppercase tracking-widest whitespace-nowrap transition-all duration-200 ${
-                    isSelected ? 'font-bold text-truffle' : 'font-medium text-bronze/40'
-                  }`}>
+                  <span
+                    className={`text-[9px] font-sans uppercase tracking-widest whitespace-nowrap transition-all duration-200 ${
+                      isSelected ? 'font-bold text-truffle' : 'font-medium'
+                    }`}
+                    style={!isSelected ? { color: MUTED_TAUPE } : undefined}
+                  >
                     {artist.name}
                   </span>
                 </button>
@@ -165,14 +181,14 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
         </div>
       </div>
 
-      {/* Reviews Container — Layer 3: on top of everything, negative margin overlaps pill */}
+      {/* Reviews Container — z-index 3, negative margin overlaps pill seamlessly */}
       <div
         ref={containerRef}
         className="mx-3 relative"
         style={{
           marginTop: -20,
           zIndex: 3,
-          background: PILL_COLOR,
+          background: PILL_BG,
           borderRadius: '1.25rem',
           padding: '2px',
           animation: isJiggling ? 'jelly-container 0.5s ease' : 'none',
@@ -185,16 +201,19 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
             {currentArtist ? (
               <>
                 <span className="text-truffle font-normal">{currentArtist.name}</span>{' '}
-                <span className="italic text-bronze">Reviews</span>
+                <span className="italic" style={{ color: MUTED_BRONZE }}>Reviews</span>
               </>
             ) : (
               <>
                 <span className="text-truffle font-normal">All</span>{' '}
-                <span className="italic text-bronze">Reviews</span>
+                <span className="italic" style={{ color: MUTED_BRONZE }}>Reviews</span>
               </>
             )}
           </h3>
-          <div className="flex items-center gap-1.5 bg-card rounded-full px-3 py-1.5 shadow-sm">
+          <div
+            className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
+            style={{ background: '#FFFFFF', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+          >
             <Star size={13} className="text-bronze fill-bronze" />
             <span className="text-sm font-sans font-bold text-truffle">{avgRating}</span>
           </div>
@@ -205,15 +224,19 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
           {filteredReviews.map((review, index) => (
             <div
               key={review.id}
-              className="bg-card rounded-[28px] p-5 border border-border/60 shadow-sm"
+              className="rounded-[28px] p-5"
               style={{
+                background: '#FFFFFF',
+                boxShadow: '0 8px 30px rgb(0 0 0 / 0.04)',
                 animation: `fade-in-up 0.4s ease-out ${index * 80}ms both`,
               }}
             >
-              {/* Reviewer info */}
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-champagne flex items-center justify-center flex-shrink-0 border border-border/50">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: PILL_BG, border: `1px solid ${PILL_BORDER}` }}
+                  >
                     <span className="font-serif text-base font-semibold text-truffle">
                       {review.userName.charAt(0)}
                     </span>
@@ -221,37 +244,41 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
                   <div>
                     <div className="flex items-center gap-1.5">
                       <span className="font-sans font-semibold text-[13px] text-truffle">{review.userName}</span>
-                      <CheckCircle2 size={13} className="text-bronze/60 fill-bronze/10" />
+                      <CheckCircle2 size={13} style={{ color: MUTED_BRONZE }} className="fill-bronze/10" />
                     </div>
                     <div className="flex items-center gap-0.5 mt-1">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star
                           key={i}
                           size={11}
-                          className={i < review.rating ? 'text-bronze fill-bronze' : 'text-border'}
+                          className={i < review.rating ? 'text-bronze fill-bronze' : ''}
+                          style={i >= review.rating ? { color: EMPTY_STAR, fill: EMPTY_STAR } : undefined}
                         />
                       ))}
                     </div>
                   </div>
                 </div>
-                <span className="text-[9px] font-sans text-bronze/60 uppercase tracking-widest whitespace-nowrap pt-1">
+                <span
+                  className="text-[9px] font-sans uppercase tracking-widest whitespace-nowrap pt-1"
+                  style={{ color: MUTED_TAUPE }}
+                >
                   {review.date}
                 </span>
               </div>
 
-              {/* Service tag */}
               <div className="mb-3">
-                <span className="inline-block text-[9px] font-sans font-bold text-truffle uppercase tracking-widest bg-champagne border border-border/50 px-3.5 py-1 rounded-full">
+                <span
+                  className="inline-block text-[9px] font-sans font-bold text-truffle uppercase tracking-widest px-3.5 py-1 rounded-full"
+                  style={{ background: PILL_BG, border: `1px solid ${PILL_BORDER}` }}
+                >
                   {review.service}
                 </span>
               </div>
 
-              {/* Review text */}
               <p className="text-[13px] font-sans text-truffle/75 leading-relaxed italic">
                 "{review.text}"
               </p>
 
-              {/* Review photos */}
               {review.hasPhoto && (
                 <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide">
                   {reviewPhotos.map((photo, i) => (
@@ -266,10 +293,10 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
 
           {filteredReviews.length === 0 && (
             <div className="text-center py-14">
-              <p className="font-serif text-base text-bronze/50 italic">
+              <p className="font-serif text-base italic" style={{ color: MUTED_BRONZE }}>
                 No reviews yet for this stylist...
               </p>
-              <p className="text-[10px] font-sans text-bronze/30 mt-2 tracking-wide">
+              <p className="text-[10px] font-sans mt-2 tracking-wide" style={{ color: MUTED_TAUPE }}>
                 Be the first to share your experience
               </p>
             </div>
