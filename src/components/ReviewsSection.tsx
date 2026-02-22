@@ -82,7 +82,7 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
 
         {/* Artist Selector with sliding background */}
         <div className="relative" ref={artistRowRef}>
-      {/* Sliding glass-orange jelly pill - bridges into the container below */}
+          {/* Jelly Pill - z-index between avatars and container */}
           {tabStyle && (
             <div
               className="absolute pointer-events-none"
@@ -91,10 +91,8 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
                 width: tabStyle.width + 16,
                 top: -4,
                 bottom: -24,
-                background: 'hsl(30 60% 92% / 0.65)',
-                border: '1px solid hsl(30 40% 85% / 0.5)',
-                borderRadius: '1.25rem 1.25rem 1.25rem 1.25rem',
-                borderBottom: '1px solid transparent',
+                background: '#F8F1E9',
+                borderRadius: '45px 45px 0 0',
                 transition: 'left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 animation: isJiggling ? 'jelly 0.55s ease' : 'none',
                 transformOrigin: 'bottom center',
@@ -103,7 +101,7 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
             />
           )}
 
-          <div className="flex gap-5 overflow-x-auto scrollbar-hide pb-3 items-end justify-center relative z-10">
+          <div className="flex overflow-x-auto scrollbar-hide pb-3 items-end justify-evenly relative" style={{ zIndex: 2 }}>
             <button
               ref={setButtonRef('_all')}
               onClick={() => onSelectArtist(null)}
@@ -117,8 +115,8 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
               >
                 ALL
               </div>
-              <span className={`text-[10px] font-sans font-medium uppercase tracking-wider transition-colors duration-200 ${
-                !selectedArtist ? 'text-truffle' : 'text-bronze/50'
+              <span className={`text-[10px] font-sans uppercase tracking-wider transition-colors duration-200 ${
+                !selectedArtist ? 'font-bold text-truffle' : 'font-medium text-bronze/50'
               }`}>
                 All Artists
               </span>
@@ -143,8 +141,8 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
                   >
                     <img src={artist.avatar} alt={artist.name} className="w-full h-full object-cover" />
                   </div>
-                  <span className={`text-[10px] font-sans font-medium uppercase tracking-wider whitespace-nowrap transition-colors duration-200 ${
-                    isSelected ? 'text-truffle' : 'text-bronze/50'
+                  <span className={`text-[10px] font-sans uppercase tracking-wider whitespace-nowrap transition-colors duration-200 ${
+                    isSelected ? 'font-bold text-truffle' : 'font-medium text-bronze/50'
                   }`}>
                     {artist.name}
                   </span>
@@ -155,28 +153,31 @@ const ReviewsSection = ({ artists, reviews, selectedArtist, onSelectArtist }: Re
         </div>
       </div>
 
-      {/* Reviews Container - overlaps upward into the pill via negative margin */}
+      {/* Reviews Container - overlaps upward into the pill */}
       <div
         ref={containerRef}
-        className="mx-3 glass-orange p-1 relative"
+        className="mx-3 p-1 relative"
         style={{
-          marginTop: -12,
+          marginTop: -16,
           zIndex: 10,
+          background: '#F8F1E9',
+          borderRadius: '1.25rem',
           animation: isJiggling ? 'jelly-container 0.5s ease' : 'none',
           transformOrigin: 'top center',
         }}
       >
         {/* Artist Reviews Header */}
         <div className="flex items-baseline justify-between px-4 pt-4 pb-3">
-          <h3 className="font-serif text-lg text-truffle">
+          <h3 className="font-serif text-lg">
             {currentArtist ? (
               <>
-                <span>{currentArtist.name.split('.')[0]}.</span>{' '}
-                <span className="text-bronze italic">Reviews</span>
+                <span className="text-truffle font-normal">{currentArtist.name.split('.')[0]}.</span>{' '}
+                <span className="italic" style={{ color: '#9A7B6D' }}>Reviews</span>
               </>
             ) : (
               <>
-                All <span className="text-bronze italic">Reviews</span>
+                <span className="text-truffle font-normal">All</span>{' '}
+                <span className="italic" style={{ color: '#9A7B6D' }}>Reviews</span>
               </>
             )}
           </h3>
